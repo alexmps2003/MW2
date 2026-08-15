@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     rabbitmq_vhost: str = "/"
     workflow_max_retries: int = 3
     workflow_retry_delay_seconds: int = 5
+    workflow_demo_delay_seconds: float = 0
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 

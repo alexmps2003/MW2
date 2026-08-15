@@ -12,6 +12,8 @@ SwiftTrack is the group prototype for the Middleware Architecture assignment. It
 - [Phase 7: resilience and recovery](docs/phase-7-resilience.md)
 - [Phase 8: delivery lifecycle](docs/phase-8-delivery-lifecycle.md)
 - [Phase 9: real-time tracking and web interface](docs/phase-9-realtime-and-ui.md)
+- [Final technical report](docs/final-report.md)
+- [Evidence log](docs/evidence-log.md)
 - [Final demonstration script](docs/final-demo-script.md)
 - [Submission checklist](docs/submission-checklist.md)
 

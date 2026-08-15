@@ -1,8 +1,11 @@
+import time
+
 from sqlalchemy.orm import Session
 
 from .adapters.cms import create_order as create_cms_order
 from .adapters.ros import create_route
 from .adapters.wms import register_package
+from .config import get_settings
 from .models import Order, OrderHistory, OrderStatus
 
 
@@ -10,6 +13,13 @@ def update_status(db: Session, order: Order, status: OrderStatus, detail: str) -
     order.status = status
     db.add(OrderHistory(order_id=order.id, status=status, detail=detail))
     db.commit()
+
+
+def _demo_delay() -> None:
+    """Optionally slow visible workflow stages for an assessment demonstration."""
+    delay = get_settings().workflow_demo_delay_seconds
+    if delay > 0:
+        time.sleep(delay)
 
 
 def run_integration_preview(db: Session, order: Order) -> dict[str, str]:
@@ -60,7 +70,10 @@ def run_order_workflow(db: Session, order: Order) -> None:
     if order.status != OrderStatus.PROCESSING:
         order.failure_step = None
         order.failure_reason = None
+        _demo_delay()
         update_status(db, order, OrderStatus.PROCESSING, "Asynchronous worker started")
+
+    _demo_delay()
 
     current_step = "CMS"
     try:
@@ -68,12 +81,14 @@ def run_order_workflow(db: Session, order: Order) -> None:
             cms_response = create_cms_order(order)
             order.cms_done = True
             update_status(db, order, OrderStatus.CMS_CONFIRMED, f"CMS response: {cms_response}")
+            _demo_delay()
 
         current_step = "WMS"
         if not order.wms_done:
             wms_response = register_package(order)
             order.wms_done = True
             update_status(db, order, OrderStatus.WMS_ACCEPTED, f"WMS response: {wms_response}")
+            _demo_delay()
 
         current_step = "ROS"
         if not order.ros_done:
@@ -81,6 +96,7 @@ def run_order_workflow(db: Session, order: Order) -> None:
             order.ros_done = True
             order.route_summary = route_summary
             update_status(db, order, OrderStatus.ROUTE_PLANNED, route_summary)
+            _demo_delay()
 
         order.failure_step = None
         order.failure_reason = None

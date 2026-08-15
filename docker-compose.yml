@@ -115,6 +115,7 @@ services:
       RABBITMQ_VHOST: "/"
       WORKFLOW_MAX_RETRIES: ${WORKFLOW_MAX_RETRIES:-3}
       WORKFLOW_RETRY_DELAY_SECONDS: ${WORKFLOW_RETRY_DELAY_SECONDS:-5}
+      WORKFLOW_DEMO_DELAY_SECONDS: ${WORKFLOW_DEMO_DELAY_SECONDS:-0}
     depends_on:
       postgres:
         condition: service_healthy

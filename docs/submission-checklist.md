@@ -1,5 +1,11 @@
 # SwiftTrack Submission Checklist
 
+## Final documentation package
+
+- [Final technical report](final-report.md)
+- [Evidence log](evidence-log.md)
+- [Final demonstration script](final-demo-script.md)
+
 ## Implementation
 
 - [x] Client order portal is implemented.

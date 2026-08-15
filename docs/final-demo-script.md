@@ -15,6 +15,14 @@ docker compose up -d --build
 
 Do not overwrite an existing `.env` unless you intentionally want to reset your local configuration.
 
+If status transitions are too fast to capture during the live-tracking demonstration, add `WORKFLOW_DEMO_DELAY_SECONDS=3` to `.env` and recreate only the worker:
+
+```bash
+docker compose up -d --build worker
+```
+
+This is an optional evidence-capture setting. Return it to `0` afterward.
+
 Open the client portal at `http://localhost:5173` and RabbitMQ Management at `http://localhost:15672` when queue evidence is required. Use the credentials in `.env`.
 
 ## 2. Normal order workflow

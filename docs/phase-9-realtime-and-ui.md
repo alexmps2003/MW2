@@ -51,3 +51,21 @@ docker compose up -d --build frontend
 Open [http://localhost:5173](http://localhost:5173), submit an order, and observe that the status changes from `RECEIVED` through the worker workflow without refreshing the page. When the order becomes `READY_FOR_DELIVERY`, use the driver controls to dispatch and complete it.
 
 For a stronger demonstration, keep the browser open on an order while using the ROS failure switch or driver API from another terminal. The timeline should update when the persisted status changes.
+
+## Slower evidence capture mode
+
+The worker supports an optional demonstration delay between visible workflow stages. This makes the `RECEIVED`, `PROCESSING`, adapter, and `READY_FOR_DELIVERY` states easier to capture without changing the normal default behavior.
+
+In the local `.env` file, add:
+
+```text
+WORKFLOW_DEMO_DELAY_SECONDS=3
+```
+
+Then recreate the worker:
+
+```bash
+docker compose up -d --build worker
+```
+
+Use `0` when the slower demonstration mode is no longer needed.
