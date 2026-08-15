@@ -1,0 +1,141 @@
+name: swifttrack
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-swifttrack}
+      POSTGRES_USER: ${POSTGRES_USER:-swifttrack}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-swifttrack_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-swifttrack} -d ${POSTGRES_DB:-swifttrack}"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-swifttrack}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-swifttrack_dev}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  cms-mock:
+    build: ./services/cms-mock
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/?wsdl')"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  ros-mock:
+    build: ./services/ros-mock
+    ports:
+      - "8002:8002"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  wms-mock:
+    build: ./services/wms-mock
+    ports:
+      - "9003:9003"
+      - "8003:8003"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  api:
+    build: ./services/platform
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-swifttrack}:${POSTGRES_PASSWORD:-swifttrack_dev}@postgres:5432/${POSTGRES_DB:-swifttrack}
+      CMS_URL: http://cms-mock:8001/
+      ROS_URL: http://ros-mock:8002
+      WMS_HOST: wms-mock
+      WMS_PORT: 9003
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-swifttrack}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-swifttrack_dev}
+      RABBITMQ_VHOST: "/"
+      WORKFLOW_MAX_RETRIES: ${WORKFLOW_MAX_RETRIES:-3}
+      WORKFLOW_RETRY_DELAY_SECONDS: ${WORKFLOW_RETRY_DELAY_SECONDS:-5}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cms-mock:
+        condition: service_healthy
+      ros-mock:
+        condition: service_healthy
+      wms-mock:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  worker:
+    build: ./services/platform
+    command: python -m app.worker
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-swifttrack}:${POSTGRES_PASSWORD:-swifttrack_dev}@postgres:5432/${POSTGRES_DB:-swifttrack}
+      CMS_URL: http://cms-mock:8001/
+      ROS_URL: http://ros-mock:8002
+      WMS_HOST: wms-mock
+      WMS_PORT: 9003
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-swifttrack}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-swifttrack_dev}
+      RABBITMQ_VHOST: "/"
+      WORKFLOW_MAX_RETRIES: ${WORKFLOW_MAX_RETRIES:-3}
+      WORKFLOW_RETRY_DELAY_SECONDS: ${WORKFLOW_RETRY_DELAY_SECONDS:-5}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      cms-mock:
+        condition: service_healthy
+      ros-mock:
+        condition: service_healthy
+      wms-mock:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  rabbitmq_data:

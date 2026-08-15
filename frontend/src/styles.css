@@ -1,0 +1,62 @@
+:root {
+  color: #f5f1e8;
+  background: #111713;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+button, input { font: inherit; }
+
+.shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 48px 0 72px; }
+.hero { display: flex; justify-content: space-between; gap: 28px; align-items: end; margin-bottom: 34px; }
+.eyebrow { color: #b9c9a1; font-size: 11px; font-weight: 800; letter-spacing: .16em; margin: 0 0 10px; }
+h1, h2, p { margin-top: 0; }
+h1 { font-size: clamp(42px, 8vw, 82px); letter-spacing: -.08em; line-height: .9; margin-bottom: 16px; }
+h2 { font-size: 25px; letter-spacing: -.04em; margin-bottom: 0; }
+.subtitle { color: #a9b2a7; margin-bottom: 0; }
+.connection { color: #8e9b8f; font-size: 13px; display: flex; gap: 9px; align-items: center; white-space: nowrap; }
+.connection.connected { color: #c8e7a9; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: #59635b; }
+.connected .dot { background: #a8d76d; box-shadow: 0 0 0 5px #a8d76d22; }
+.grid { display: grid; grid-template-columns: minmax(280px, .75fr) minmax(0, 1.25fr); gap: 18px; }
+.card { border: 1px solid #2b362d; border-radius: 22px; background: #182019; padding: 25px; box-shadow: 0 18px 45px #0000001a; }
+.card-heading { display: flex; justify-content: space-between; gap: 18px; align-items: start; margin-bottom: 25px; }
+label { display: grid; gap: 8px; color: #a9b2a7; font-size: 13px; margin-bottom: 16px; }
+input { width: 100%; border: 1px solid #3a493d; border-radius: 11px; background: #101611; color: #f5f1e8; padding: 12px 13px; outline: none; }
+input:focus { border-color: #a8d76d; box-shadow: 0 0 0 3px #a8d76d1c; }
+button { border: 0; border-radius: 11px; background: #c4e795; color: #152015; cursor: pointer; font-weight: 800; padding: 12px 16px; }
+button:hover { background: #d2f3a5; }
+button.secondary { background: #2d3b30; color: #d9e5d2; }
+button.danger { background: #6d3832; color: #ffe8df; }
+.lookup, .action-row { display: flex; gap: 9px; }
+.lookup input { min-width: 0; }
+.divider { border-top: 1px solid #2b362d; color: #738074; font-size: 12px; margin: 25px 0 18px; padding-top: 18px; }
+.status-pill { border: 1px solid #66844c; border-radius: 999px; color: #c8e7a9; font-size: 11px; font-weight: 800; letter-spacing: .05em; padding: 7px 10px; }
+.order-id { color: #7c897e; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+.progress { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; margin: 30px 0 34px; }
+.progress-step { display: grid; gap: 8px; color: #617063; font-size: 10px; line-height: 1.15; }
+.progress-step span { height: 5px; border-radius: 5px; background: #2d392f; }
+.progress-step.active { color: #c8e7a9; }
+.progress-step.active span { background: #a8d76d; }
+.timeline { display: grid; gap: 18px; max-height: 330px; overflow: auto; padding-right: 8px; }
+.timeline-entry { display: grid; grid-template-columns: 12px 1fr; gap: 12px; position: relative; }
+.timeline-entry:not(:last-child)::after { content: ""; position: absolute; left: 5px; top: 14px; bottom: -20px; width: 1px; background: #3a493d; }
+.timeline-dot { width: 11px; height: 11px; border-radius: 50%; background: #a8d76d; margin-top: 3px; z-index: 1; }
+.timeline-entry strong { font-size: 13px; color: #e9f0e4; }
+.timeline-entry p { color: #8d9a8e; font-size: 12px; line-height: 1.45; margin: 4px 0 0; }
+.empty-state { color: #879387; border: 1px dashed #3a493d; border-radius: 14px; padding: 28px; line-height: 1.5; }
+.driver-card { margin-top: 18px; }
+.driver-card .card-heading { margin-bottom: 0; }
+.action-row input { flex: 1; min-width: 180px; }
+.message { margin-top: 18px; border-radius: 12px; border: 1px solid #66844c; color: #c8e7a9; background: #253322; padding: 13px 15px; }
+.message.error { border-color: #a85d50; color: #ffd0c2; background: #38211f; }
+
+@media (max-width: 800px) {
+  .shell { width: min(100% - 24px, 600px); padding-top: 28px; }
+  .hero { display: grid; align-items: start; }
+  .grid { grid-template-columns: 1fr; }
+  .progress { overflow-x: auto; grid-template-columns: repeat(8, 92px); padding-bottom: 8px; }
+  .action-row { flex-wrap: wrap; }
+}
